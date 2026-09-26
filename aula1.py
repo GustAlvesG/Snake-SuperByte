@@ -1,10 +1,16 @@
 import pygame
-import time
 import random
 
+
+LARGURA = 500
+ALTURA = 800
+TAM = 50
+TEMPO_TOTAL = tempo_restante = 5
+
 def sortear_posicao():
-    x = random.randint(0, 750)
-    y = random.randint(0, 550)
+    x = random.randint(0, LARGURA - TAM)
+    y = random.randint(0, ALTURA - TAM)
+    
     return x, y
 
 def sortear_cor():
@@ -13,13 +19,18 @@ def sortear_cor():
     b = random.randint(0,200)
     return (r,g,b)
 
+def nascer_alvo():
+    alvo.topleft = sortear_posicao()
+    while alvo.colliderect(jogador):
+        alvo.topleft = sortear_posicao()
+    
 pygame.init()
 
 #Clock - Define a taxa de atualização
 clock = pygame.time.Clock()
 
 #Define a tela e seu tamanho
-tela = pygame.display.set_mode((1200,800))
+tela = pygame.display.set_mode((LARGURA, ALTURA))
 
 #Define o título da janela
 pygame.display.set_caption("Aula de Pygame muito legal e daora")
@@ -28,23 +39,30 @@ pygame.display.set_caption("Aula de Pygame muito legal e daora")
 fonte = pygame.font.SysFont("arial", 28)
 
 #Define a posição e cor iniciais do jogador
-x = 200
-y = 200
+
 rgb = (255,0,0)
-jogador = pygame.Rect(x, y, 50, 50)
+jogador = pygame.Rect(LARGURA / 2, ALTURA / 2, TAM, TAM)
 pontos = 0 
 # Define a posição e cor do alvo aleatoriamente
 alvo_x, alvo_y = sortear_posicao()
 alvo_rgb = sortear_cor()
-alvo = pygame.Rect(alvo_x, alvo_y, 50, 50)
+alvo = pygame.Rect(alvo_x, alvo_y, TAM, TAM)
 
 #Define a velocidade
 velocidade = 5
 dx = 0
 dy = 0
 
-rodando = True
+
+# DEFINIÇÕES - Tudo antes do while infinito
+# OUVIR O JOGADOR - Capturar evento
+# MUDAR O MUNDO - Atualizar o cenário
+# DESENHAR O MUNDO - Atualizar a tela
+
+
+rodando = jogando = True
 while rodando:
+    #Ouvir o jogador
     for evento in pygame.event.get():
         #Evento de fechar o jogo
         if evento.type == pygame.QUIT:
@@ -70,10 +88,13 @@ while rodando:
                 dx = velocidade
                 dy = 0
 
+    # Mudar o mundo
+    if tempo_restante <= 0:
+        jogando = False
+
     jogador.x += dx
     jogador.y += dy
     # Define o fundo do jogo para branco
-    tela.fill((255,255,255))
 
 
     # Verifica as bordas e impede o quadro de sair
@@ -84,18 +105,29 @@ while rodando:
     # e sorteia uma nova posição/cor para o alvo 
     if jogador.colliderect(alvo):
         rgb = alvo_rgb
-        alvo.topleft = sortear_posicao()
+        nascer_alvo()
         alvo_rgb = sortear_cor()
         pontos += 1
-        print(f"PONTOS = {pontos}")
 
-    pygame.draw.rect(tela, rgb, jogador)
-    pygame.draw.rect(tela, alvo_rgb, alvo)
-    texto = fonte.render("Pontos: " + str(pontos), True, (0,0,0))
-    tela.blit(texto, (10,10))
+    #Atualizar o mundo
+    if jogando:
+        tela.fill((255,255,255))
+        pygame.draw.rect(tela, rgb, jogador)
+        pygame.draw.rect(tela, alvo_rgb, alvo)
+        tempo_restante = TEMPO_TOTAL - pygame.time.get_ticks() // 1000 
+        texto = fonte.render(f"Pontos: {str(pontos)}", True, (0,0,0))
+        tempo = fonte.render(f"Tempo: {str(tempo_restante)}", True, (0,0,0))
+        tela.blit(texto, (10,10))
+        tela.blit(tempo, (10,45))
+
+    else:
+        tela.fill((255,255,255))
+        mensagem = fonte.render("FIM DE JOGO", True, (0,0,0))
+        texto = fonte.render(f"Pontos: {str(pontos)}", True, (0,0,0))
+
+        tela.blit(mensagem, (LARGURA /2, ALTURA / 2))
+        tela.blit(texto, (LARGURA /2, ALTURA / 2 + 35))
+
     pygame.display.flip()
     clock.tick(60)
-    
-    
-
 pygame.quit()

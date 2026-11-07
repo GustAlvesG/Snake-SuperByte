@@ -53,7 +53,7 @@ def desenhar_peca(tela, celulas, linha, coluna):
         bloco = pygame.Rect(x, y, TAM, TAM)
         pygame.draw.rect(tela, ROXO, bloco)
         pygame.draw.rect(tela, PRETO, bloco, 1)
-        
+
 def cabe(celulas, linha, coluna):
     #A peça cabe aqui? Toda célula precisa estar dentro do tabuleiro
     for dl, dc in celulas:
@@ -109,15 +109,6 @@ while rodando:
                     peca_coluna += 1
             elif evento.key == pygame.K_DOWN:
                 if cabe(celulas, peca_linha + 1, peca_coluna):
-                    peca_linha += 1
-            elif evento.key == pygame.K_a:
-                while cabe(celulas, peca_linha, peca_coluna - 1):
-                    peca_coluna -= 1
-            elif evento.key == pygame.K_d:
-                while cabe(celulas, peca_linha, peca_coluna + 1):
-                    peca_coluna += 1
-            elif evento.key == pygame.K_SPACE:
-                while cabe(celulas, peca_linha + 1, peca_coluna):
                     peca_linha += 1
             elif evento.key == pygame.K_UP:
                 proxima = (indice + 1) % len(FORMAS)
